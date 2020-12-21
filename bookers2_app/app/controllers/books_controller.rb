@@ -1,5 +1,6 @@
 class BooksController < ApplicationController
-  before_action :authenticate_user!
+  # before_action :authenticate_user!　（開発の途中で入力していた。質問したい）
+  before_action :ensure_correct_user, {only:[:edit,:update,:destroy]}
 
   def index
     @book = Book.new
@@ -13,11 +14,15 @@ class BooksController < ApplicationController
   end
 
   def create
+    @books = Book.all
     @book = Book.new(book_params)
-    p current_user
     @book.user_id = current_user.id
-    @book.save
-    redirect_to book_path(@book.id)
+    if @book.save
+      flash[:notice] = "successfully posted!"
+      redirect_to book_path(@book.id)
+    else
+      render("books/index")
+    end
   end
 
   def edit
@@ -26,8 +31,12 @@ class BooksController < ApplicationController
 
   def update
     @book = Book.find(params[:id])
-    @book.update(book_params)
-    redirect_to book_path(@book.id)
+    if @book.update(book_params)
+      flash[:notice] = "successfully edited!"
+      redirect_to book_path(@book.id)
+    else
+      render("books/edit")
+    end
   end
 
   def destroy
@@ -40,6 +49,14 @@ private
 
   def book_params
     params.require(:book).permit(:title, :opinion)
+  end
+
+  def ensure_correct_user
+    @book = Book.find(params[:id])
+    if @book.user.id != current_user.id
+      flash[:notice] = "権限ないよ"
+      redirect_to book_path(@book.id)
+    end
   end
 
 end
