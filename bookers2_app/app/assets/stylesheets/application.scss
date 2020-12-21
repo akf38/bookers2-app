@@ -13,3 +13,23 @@
  *= require_tree .
  *= require_self
  */
+ @import "bootstrap";
+
+ main{
+     margin-top:30px;
+ }
+
+footer{
+    margin-top:50px;
+}
+.footermessage{
+  text-align: center;
+}
+
+.flash-message{
+  color: green;
+}
+
+.alert{
+  color:red;
+}
